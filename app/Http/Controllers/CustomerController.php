@@ -29,7 +29,8 @@ class CustomerController extends Controller implements HasMiddleware
 
     public function create()
     {
-        return view('customers.create');
+        $customers = Customer::all();
+        return view('customers.create', compact('customers'));
     }
 
     public function store(Request $request)
@@ -73,7 +74,8 @@ class CustomerController extends Controller implements HasMiddleware
 
     public function edit(Customer $customer)
     {
-        return view('customers.edit', compact('customer'));
+        $customers = Customer::where('id', '!=', $customer->id)->get();
+        return view('customers.edit', compact('customer', 'customers'));
     }
 
     public function update(Request $request, Customer $customer)

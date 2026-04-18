@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function() {
     })->name('dashboard');
 
     Route::get('/rentals/create', [\App\Http\Controllers\RentalController::class, 'create'])->name('rentals.create');
+    Route::post('/rentals', [\App\Http\Controllers\RentalController::class, 'store'])->name('rentals.store');
 
     Route::get('/settings', function () {
         return view('settings');

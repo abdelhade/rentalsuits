@@ -360,6 +360,66 @@
                 }
             }
         });
+
+        // Enter acts as Tab (Robust Version)
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                var el = e.target;
+                
+                // Allow Submit/Button default behavior
+                if (el.tagName === 'BUTTON' || (el.tagName === 'INPUT' && el.type === 'submit')) {
+                    return;
+                }
+                
+                // Allow Textarea to make new lines
+                if (el.tagName === 'TEXTAREA') {
+                    return;
+                }
+
+                // If inside Select2 search, do not prevent default so it can select the option
+                if (el.classList.contains('select2-search__field')) {
+                    return; // Let select2 handle selection
+                }
+
+                e.preventDefault();
+
+                // Find all focusable elements
+                var focusables = Array.from(document.querySelectorAll('input, select, textarea, button'))
+                                     .filter(elem => !elem.disabled && !elem.readOnly && elem.offsetParent !== null); // offsetParent !== null means visible
+                
+                var index = focusables.indexOf(el);
+                if (index > -1 && index + 1 < focusables.length) {
+                    var next = focusables[index + 1];
+                    
+                    if ($(next).hasClass('select2-hidden-accessible')) {
+                        $(next).select2('focus');
+                        $(next).select2('open');
+                    } else {
+                        next.focus();
+                        if (typeof next.select === 'function') next.select();
+                    }
+                }
+            }
+        });
+
+        // Move to next input gracefully when Select2 closes after selection
+        $(document).on('select2:select', function(e) {
+            setTimeout(function() {
+                var el = e.target;
+                var focusables = Array.from(document.querySelectorAll('input, select, textarea, button'))
+                                     .filter(elem => !elem.disabled && !elem.readOnly && elem.offsetParent !== null);
+                var index = focusables.indexOf(el);
+                if (index > -1 && index + 1 < focusables.length) {
+                    var next = focusables[index + 1];
+                    if ($(next).hasClass('select2-hidden-accessible')) {
+                        $(next).select2('focus');
+                    } else {
+                        next.focus();
+                        if (typeof next.select === 'function') next.select();
+                    }
+                }
+            }, 100);
+        });
     </script>
     @stack('scripts')
 </body>

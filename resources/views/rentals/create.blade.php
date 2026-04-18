@@ -5,7 +5,7 @@
     <h3 class="page-title">إضافـة إيجـار بـدلة</h3>
 </div>
 
-<form action="#" method="POST" id="rentalForm">
+<form action="{{ route('rentals.store') }}" method="POST" id="rentalForm">
     @csrf
 
     <!-- رأس الفاتورة (Header) -->
@@ -296,7 +296,11 @@
                     }
                 },
                 error: function(err) {
-                    Swal.fire('خطأ', 'تأكد من صحة البيانات (قد يكون الرقم مسجل مسبقاً)', 'error');
+                    let errorMessage = 'تأكد من صحة البيانات (قد يكون الرقم مسجل مسبقاً)';
+                    if (err.responseJSON && err.responseJSON.errors) {
+                        errorMessage = Object.values(err.responseJSON.errors)[0][0];
+                    }
+                    Swal.fire('خطأ', errorMessage, 'error');
                 }
             });
         });

@@ -16,9 +16,15 @@
             </div>
             
             <div class="col-md-6 mb-3">
-                <label for="phone" class="form-label">رقم الهاتف</label>
+                <label for="phone" class="form-label">رقم الهاتف 1</label>
                 <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone') }}">
                 @error('phone')<div class="text-danger mt-1">{{ $message }}</div>@enderror
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label for="phone_2" class="form-label">رقم الهاتف 2</label>
+                <input type="text" name="phone_2" id="phone_2" class="form-control" value="{{ old('phone_2') }}">
+                @error('phone_2')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             </div>
             
             <div class="col-md-6 mb-3">
@@ -32,6 +38,17 @@
                 <input type="text" name="address" id="address" class="form-control" value="{{ old('address') }}">
                 @error('address')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             </div>
+
+            <div class="col-md-12 mb-3">
+                <label for="referred_by" class="form-label">العميل المرشح</label>
+                <select name="referred_by" id="referred_by" class="form-select select2">
+                    <option value="">-- بدون ترشيح --</option>
+                    @foreach($customers as $c)
+                        <option value="{{ $c->id }}" {{ old('referred_by') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                    @endforeach
+                </select>
+                @error('referred_by')<div class="text-danger mt-1">{{ $message }}</div>@enderror
+            </div>
         </div>
 
         <div class="mt-4">
@@ -41,3 +58,11 @@
     </form>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({ dir: "rtl" });
+    });
+</script>
+@endpush

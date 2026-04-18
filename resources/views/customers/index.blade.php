@@ -28,7 +28,12 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $customer->name }}</td>
-                    <td>{{ $customer->phone ?? '---' }}</td>
+                    <td>
+                        {{ $customer->phone ?? '---' }}
+                        @if($customer->phone_2)
+                            <br><small class="text-muted">{{ $customer->phone_2 }}</small>
+                        @endif
+                    </td>
                     <td>{{ $customer->city ?? '---' }}</td>
                     <td>{{ $customer->address ?? '---' }}</td>
                     <td>

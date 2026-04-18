@@ -205,6 +205,9 @@
             <li class="{{ request()->routeIs('reports.ledger') ? 'active' : '' }}">
                 <a href="/reports/ledger"><i class="fa-solid fa-book-open"></i> دفتر التأجير</a>
             </li>
+            <li class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
+                <a href="{{ route('users.index') }}"><i class="fa-solid fa-users-gear"></i> إدارة المستخدمين والصلاحيات</a>
+            </li>
             <li class="{{ request()->routeIs('customers.*') ? 'active' : '' }}">
                 <a href="{{ route('customers.index') }}"><i class="fa-solid fa-users"></i> العملاء</a>
             </li>
@@ -244,7 +247,12 @@
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#">الإعدادات</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="#">تسجيل الخروج</a></li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="dropdown-item text-danger w-100 text-end">تسجيل الخروج</button>
+                            </form>
+                        </li>
                     </ul>
                 </div>
             </div>

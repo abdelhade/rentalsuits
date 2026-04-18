@@ -23,10 +23,15 @@ class PermissionSeeder extends Seeder
         $adminRole = Role::findOrCreate('admin');
         $adminRole->givePermissionTo(Permission::all());
 
-        // Assign to first user if exists
-        $user = User::first();
-        if($user) {
-            $user->assignRole('admin');
-        }
+        // Create the admin user
+        $user = User::updateOrCreate(
+            ['email' => 'admin@admin.com'],
+            [
+                'name' => 'admin',
+                'password' => bcrypt('123')
+            ]
+        );
+        
+        $user->assignRole('admin');
     }
 }

@@ -205,11 +205,20 @@
             <li class="{{ request()->routeIs('reports.ledger') ? 'active' : '' }}">
                 <a href="/reports/ledger"><i class="fa-solid fa-book-open"></i> دفتر التأجير</a>
             </li>
-            <li>
-                <a href="#"><i class="fa-solid fa-users"></i> العملاء والموردين</a>
+            <li class="{{ request()->routeIs('customers.*') ? 'active' : '' }}">
+                <a href="{{ route('customers.index') }}"><i class="fa-solid fa-users"></i> العملاء</a>
             </li>
-            <li>
-                <a href="#"><i class="fa-solid fa-boxes-stacked"></i> المجموعات والأصناف</a>
+            <li class="{{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
+                <a href="{{ route('suppliers.index') }}"><i class="fa-solid fa-truck-field"></i> الموردين</a>
+            </li>
+            <li class="{{ request()->routeIs('safes.*') ? 'active' : '' }}">
+                <a href="{{ route('safes.index') }}"><i class="fa-solid fa-vault"></i> الصناديق/الخزائن</a>
+            </li>
+            <li class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                <a href="{{ route('categories.index') }}"><i class="fa-solid fa-sitemap"></i> المجموعات </a>
+            </li>
+            <li class="{{ request()->routeIs('items.*') ? 'active' : '' }}">
+                <a href="{{ route('items.index') }}"><i class="fa-solid fa-boxes-stacked"></i> الأصناف</a>
             </li>
             <li>
                 <a href="#"><i class="fa-solid fa-file-invoice-dollar"></i> السندات (قبض/دفع)</a>
@@ -273,6 +282,17 @@
             } else {
                 sidebar.css('right', '0');
                 mainContent.css('margin-right', '260px');
+            }
+        });
+
+        // Global F3 Shortcut for 'Add New'
+        $(document).on('keydown', function(e) {
+            if (e.key === 'F3') {
+                e.preventDefault(); // Prevent default browser search behavior
+                var addNewBtn = $('#add-new-btn');
+                if (addNewBtn.length) {
+                    window.location.href = addNewBtn.attr('href');
+                }
             }
         });
     </script>

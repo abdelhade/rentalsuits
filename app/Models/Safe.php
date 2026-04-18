@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Safe extends Model
 {
-    //
+    protected $fillable = ['account_id', 'name'];
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
+    }
 }

@@ -2,6 +2,17 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SafeController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ItemController;
+
+Route::resource('customers', CustomerController::class);
+Route::resource('suppliers', SupplierController::class);
+Route::resource('safes', SafeController::class);
+Route::resource('categories', CategoryController::class);
+Route::resource('items', ItemController::class);
 
 Route::get('/', function () {
     return view('dashboard');

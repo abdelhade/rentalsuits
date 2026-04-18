@@ -233,7 +233,7 @@
         <div class="sidebar-brand">
             <i class="fa-solid fa-user-tie"></i> رينتالز ERP
         </div>
-        
+        <ul class="sidebar-menu">
             <li class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <a href="/"><i class="fa-solid fa-calendar-days"></i> التقويم والمبيعات</a>
             </li>
@@ -243,6 +243,13 @@
             <li class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
                 <a href="{{ route('users.index') }}"><i class="fa-solid fa-users-gear"></i> إدارة المستخدمين والصلاحيات</a>
             </li>
+            <li class="sidebar-heading" style="padding: 12px 25px; color: rgba(255,255,255,0.6); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">البيانات</li>
+            <li class="{{ request()->routeIs('items.*') ? 'active' : '' }}">
+                <a href="{{ route('items.index') }}"><i class="fa-solid fa-boxes-stacked"></i> الأصناف</a>
+            </li>
+            <li class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                <a href="{{ route('categories.index') }}"><i class="fa-solid fa-sitemap"></i> مجموعات الأصناف</a>
+            </li>
             <li class="{{ request()->routeIs('customers.*') ? 'active' : '' }}">
                 <a href="{{ route('customers.index') }}"><i class="fa-solid fa-users"></i> العملاء</a>
             </li>
@@ -251,12 +258,6 @@
             </li>
             <li class="{{ request()->routeIs('safes.*') ? 'active' : '' }}">
                 <a href="{{ route('safes.index') }}"><i class="fa-solid fa-vault"></i> الصناديق/الخزائن</a>
-            </li>
-            <li class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">
-                <a href="{{ route('categories.index') }}"><i class="fa-solid fa-sitemap"></i> المجموعات </a>
-            </li>
-            <li class="{{ request()->routeIs('items.*') ? 'active' : '' }}">
-                <a href="{{ route('items.index') }}"><i class="fa-solid fa-boxes-stacked"></i> الأصناف</a>
             </li>
             <li>
                 <a href="#"><i class="fa-solid fa-file-invoice-dollar"></i> السندات (قبض/دفع)</a>

@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="name" class="form-label">الاسم <span class="text-danger">*</span></label>
-                <input type="text" name="name" id="name" class="form-control" required value="{{ old('name', $supplier->name) }}">
+                <input type="text" name="name" id="name" class="form-control frst" autofocus required value="{{ old('name', $supplier->name) }}">
                 @error('name')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             </div>
             

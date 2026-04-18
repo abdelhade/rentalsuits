@@ -95,7 +95,7 @@
                 <label for="login" class="form-label text-muted">اسم المستخدم، البريد، أو الهاتف</label>
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-user"></i></span>
-                    <input type="text" id="login" name="login" class="form-control border-start-0 ps-0" placeholder="أدخل اسم المستخدم أو الهاتف أو الإيميل" required autofocus value="{{ old('login') }}">
+                    <input type="text" id="login" name="login" class="form-control frst border-start-0 ps-0" placeholder="أدخل اسم المستخدم أو الهاتف أو الإيميل" required autofocus value="{{ old('login') }}">
                 </div>
             </div>
 
@@ -103,7 +103,7 @@
                 <label for="password" class="form-label text-muted">كلمة المرور</label>
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" id="password" name="password" class="form-control border-start-0 ps-0" placeholder="أدخل كلمة المرور" required>
+                    <input type="password" id="password" name="password" class="form-control frst border-start-0 ps-0" placeholder="أدخل كلمة المرور" required>
                 </div>
             </div>
 

@@ -21,7 +21,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="name" class="form-label">اسم المجموعة <span class="text-danger">*</span></label>
-                <input type="text" name="name" id="name" class="form-control" required value="{{ old('name', $category->name) }}">
+                <input type="text" name="name" id="name" class="form-control frst" autofocus required value="{{ old('name', $category->name) }}">
             </div>
 
             <div class="col-md-6 mb-3">

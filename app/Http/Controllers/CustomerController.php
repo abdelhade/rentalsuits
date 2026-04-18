@@ -6,9 +6,21 @@ use App\Models\Customer;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class CustomerController extends Controller
+class CustomerController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view customers', only: ['index', 'show']),
+            new Middleware('permission:create customers', only: ['create', 'store']),
+            new Middleware('permission:edit customers', only: ['edit', 'update']),
+            new Middleware('permission:delete customers', only: ['destroy']),
+        ];
+    }
+
     public function index()
     {
         $customers = Customer::latest()->paginate(10);

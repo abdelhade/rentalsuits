@@ -5,9 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ItemController extends Controller
+class ItemController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view items', only: ['index', 'show']),
+            new Middleware('permission:create items', only: ['create', 'store']),
+            new Middleware('permission:edit items', only: ['edit', 'update']),
+            new Middleware('permission:delete items', only: ['destroy']),
+        ];
+    }
+
     public function index()
     {
         $items = Item::with('category')->latest()->paginate(10);

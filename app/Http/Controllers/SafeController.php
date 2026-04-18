@@ -6,9 +6,21 @@ use App\Models\Safe;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class SafeController extends Controller
+class SafeController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view safes', only: ['index', 'show']),
+            new Middleware('permission:create safes', only: ['create', 'store']),
+            new Middleware('permission:edit safes', only: ['edit', 'update']),
+            new Middleware('permission:delete safes', only: ['destroy']),
+        ];
+    }
+
     public function index()
     {
         $safes = Safe::latest()->paginate(10);

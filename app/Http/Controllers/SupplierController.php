@@ -6,9 +6,21 @@ use App\Models\Supplier;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class SupplierController extends Controller
+class SupplierController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view suppliers', only: ['index', 'show']),
+            new Middleware('permission:create suppliers', only: ['create', 'store']),
+            new Middleware('permission:edit suppliers', only: ['edit', 'update']),
+            new Middleware('permission:delete suppliers', only: ['destroy']),
+        ];
+    }
+
     public function index()
     {
         $suppliers = Supplier::latest()->paginate(10);

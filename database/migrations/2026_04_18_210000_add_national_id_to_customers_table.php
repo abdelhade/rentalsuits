@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('invoice_items', function (Blueprint $table) {
-            $table->integer('duration')->default(1)->comment('Rental duration in days');
+        Schema::table('customers', function (Blueprint $table) {
+            $table->string('national_id')->nullable()->unique()->comment('الرقم القومي للعميل');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('invoice_items', function (Blueprint $table) {
-            //
+        Schema::table('customers', function (Blueprint $table) {
+            $table->dropColumn('national_id');
         });
     }
 };

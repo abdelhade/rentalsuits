@@ -421,6 +421,16 @@
                 }
             }, 100);
         });
+        // Global: Submit button → loading state
+        $(document).on('submit', 'form', function() {
+            var btn = $(this).find('button[type="submit"]');
+            btn.each(function() {
+                var $b = $(this);
+                $b.data('original-html', $b.html());
+                $b.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span> جاري الحفظ...');
+                $b.prop('disabled', true);
+            });
+        });
     </script>
     @stack('scripts')
 </body>

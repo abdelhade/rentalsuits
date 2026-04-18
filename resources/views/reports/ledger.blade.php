@@ -75,16 +75,33 @@
                         totalPaid += parseFloat(row.paid_amount);
                         totalRemaining += remaining;
 
+                        // Build items display: "صنف1 + صنف2"
+                        var itemsText = '';
+                        if (row.invoice_items && row.invoice_items.length > 0) {
+                            var itemNames = row.invoice_items.map(function(ii) {
+                                var name = ii.item ? ii.item.name : 'صنف';
+                                var itemNote = ii.notes ? ' <span class="badge bg-warning text-dark" style="font-size:0.7rem;">' + ii.notes + '</span>' : '';
+                                return name + itemNote;
+                            });
+                            itemsText = itemNames.join(' + ');
+                        }
+
+                        // Invoice-level notes in yellow label
+                        var invoiceNotes = '';
+                        if (row.notes) {
+                            invoiceNotes = '<br><span class="badge bg-warning text-dark mt-1" style="font-size:0.75rem;"><i class="fa fa-sticky-note"></i> ' + row.notes + '</span>';
+                        }
+
                         tbody.append(`
                             <tr>
                                 <td>${index + 1}</td>
-                                <td class="fw-bold">${row.customer.name}</td>
-                                <td>${row.customer.city || '-'}</td>
-                                <td>${row.customer.phone || '-'}</td>
+                                <td class="fw-bold">${row.customer ? row.customer.name : '-'}</td>
+                                <td>${row.customer ? (row.customer.city || '-') : '-'}</td>
+                                <td>${row.customer ? (row.customer.phone || '-') : '-'}</td>
                                 <td class="text-primary fw-bold">${row.total_amount}</td>
                                 <td class="text-success fw-bold">${row.paid_amount}</td>
                                 <td class="text-danger fw-bold">${remaining}</td>
-                                <td class="text-start">${row.notes || ''}</td>
+                                <td class="text-start">${itemsText}${invoiceNotes}</td>
                                 <td>
                                     <button class="btn btn-sm btn-light text-primary"><i class="fa fa-edit"></i></button>
                                 </td>

@@ -13,7 +13,7 @@ class ReportController extends Controller
         $date = $request->query('date', date('Y-m-d'));
 
         // Load invoices for the given day along with the customer
-        $invoices = Invoice::with('customer')
+        $invoices = Invoice::with(['customer', 'invoiceItems.item'])
             ->whereDate('date', $date)
             ->where('type', 'rent')
             ->latest()

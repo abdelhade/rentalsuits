@@ -33,40 +33,57 @@ class RentalController extends Controller
             'items.*.notes' => 'nullable|string',
         ]);
 
-        $invoice = new \App\Models\Invoice();
-        $invoice->invoice_number = 'R-' . mt_rand(100000, 999999);
-        $invoice->type = 'rent';
-        $invoice->entity_id = $request->customer_id;
-        $invoice->date = $request->date;
-        $invoice->total_amount = $request->total_amount;
-        $invoice->paid_amount = $request->paid_amount;
-        $invoice->notes = $request->invoice_notes ?? null;
-        $invoice->save();
+        try {
+            \DB::beginTransaction();
 
-        foreach ($request->items as $itemData) {
-            $item = new \App\Models\InvoiceItem();
-            $item->invoice_id = $invoice->id;
-            $item->item_id = $itemData['item_id'];
-            $item->qty = $itemData['qty'];
-            $item->price = $itemData['price'];
-            $item->total = $itemData['total'] ?? ($itemData['qty'] * $itemData['price']);
-            $item->notes = $itemData['notes'] ?? null;
-            $item->save();
+            // 1. إنشاء الفاتورة
+            $invoice = new \App\Models\Invoice();
+            $invoice->invoice_number = 'R-' . mt_rand(100000, 999999);
+            $invoice->type = 'rent';
+            $invoice->entity_id = $request->customer_id;
+            $invoice->date = $request->date;
+            $invoice->total_amount = $request->total_amount;
+            $invoice->paid_amount = $request->paid_amount;
+            $invoice->notes = $request->invoice_notes ?? null;
+            if (!$invoice->save()) {
+                throw new \Exception('فشل في حفظ الفاتورة');
+            }
+
+            // 2. إنشاء بنود الفاتورة
+            foreach ($request->items as $index => $itemData) {
+                $item = new \App\Models\InvoiceItem();
+                $item->invoice_id = $invoice->id;
+                $item->item_id = $itemData['item_id'];
+                $item->qty = $itemData['qty'];
+                $item->price = $itemData['price'];
+                $item->total = $itemData['total'] ?? ($itemData['qty'] * $itemData['price']);
+                $item->notes = $itemData['notes'] ?? null;
+                if (!$item->save()) {
+                    throw new \Exception('فشل في حفظ الصنف رقم ' . ($index + 1));
+                }
+            }
+
+            // 3. إنشاء سند القبض إذا كان هناك مبلغ مدفوع
+            if (floatval($request->paid_amount) > 0) {
+                $voucher = new \App\Models\Voucher();
+                $voucher->voucher_number = 'V-' . time() . rand(10, 99);
+                $voucher->type = 'receipt';
+                $voucher->safe_id = $request->safe_id;
+                $voucher->account_id = $invoice->entity_id;
+                $voucher->amount = $request->paid_amount;
+                $voucher->date = $request->date;
+                $voucher->description = 'سند قبض من الفاتورة ' . $invoice->invoice_number;
+                if (!$voucher->save()) {
+                    throw new \Exception('فشل في إنشاء سند القبض');
+                }
+            }
+
+            \DB::commit();
+            return redirect()->route('rentals.create')->with('success', 'تم حفظ الفاتورة بنجاح');
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'حدث خطأ أثناء الحفظ: ' . $e->getMessage());
         }
-
-        // If there is a payment, create a receipt voucher linked to the selected safe
-        if (floatval($request->paid_amount) > 0) {
-            $voucher = new \App\Models\Voucher();
-            $voucher->voucher_number = 'V-' . time() . rand(10, 99);
-            $voucher->type = 'receipt';
-            $voucher->safe_id = $request->safe_id;
-            $voucher->account_id = $invoice->entity_id; // assuming the customer account
-            $voucher->amount = $request->paid_amount;
-            $voucher->date = $request->date;
-            $voucher->description = 'سند قبض من الفاتورة ' . $invoice->invoice_number;
-            $voucher->save();
-        }
-
-        return redirect()->route('rentals.create')->with('success', 'تم حفظ الفاتورة بنجاح');
     }
 }

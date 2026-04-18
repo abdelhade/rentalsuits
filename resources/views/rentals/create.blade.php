@@ -8,6 +8,32 @@
 <form action="{{ route('rentals.store') }}" method="POST" id="rentalForm">
     @csrf
 
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-check-circle"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-exclamation-triangle"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-exclamation-triangle"></i> <strong>يوجد أخطاء في البيانات:</strong>
+            <ul class="mb-0 mt-1">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <!-- رأس الفاتورة (Header) -->
     <div class="card card-glass p-4 mb-4">
         <h5 class="mb-3 text-primary"><i class="fa-solid fa-address-card"></i> بيانات العميل (الهيد)</h5>
@@ -21,17 +47,12 @@
                             <option value="{{ $cust->id }}" data-national-id="{{ $cust->national_id }}">{{ $cust->name }} - {{ $cust->phone }}</option>
                         @endforeach
                     </select>
-                    <div class="mt-2">
-                        <label class="form-label">الرقم القومي للعميل</label>
-                        <input type="text" id="customer_national_id" class="form-control" readonly placeholder="سيظهر الرقم القومي عند اختيار العميل">
-                    </div>
                     <button class="btn btn-primary px-3" type="button" data-bs-toggle="modal" data-bs-target="#newCustomerModal">
                         <i class="fa-solid fa-plus"></i> إضافة
                     </button>
                 </div>
             </div>
-            
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <label class="form-label">تاريخ الحجز <span class="text-danger">*</span></label>
                 <input type="date" name="date" class="form-control fw-bold text-center" value="{{ $date }}" required>
             </div>
@@ -57,7 +78,7 @@
                 <tbody>
                     <tr>
                         <td>
-                            <select name="items[0][item_id]" class="form-select select-item" required>
+                            <select name="items[0][item_id]" class="form-select select-item select2-item" required>
                                 <option value="">-- اختر الصنف --</option>
                                 @foreach($items as $i)
                                     <option value="{{ $i->id }}" data-price="{{ $i->rental_price }}">{{ $i->name }} {{ $i->barcode ? '('.$i->barcode.')' : '' }}</option>
@@ -92,26 +113,35 @@
         <div class="row g-3">
             <div class="col-md-4">
                 <label class="form-label fw-bold">الإجمالي</label>
-                <div class="input-group">
-                    <input type="number" name="total_amount" id="final_total" class="form-control fs-4 fw-bold text-danger text-center bg-white" value="0" readonly required>
-                    <span class="input-group-text">جنيه</span>
-                </div>
+                <input type="number" name="total_amount" id="final_total" class="form-control fs-4 fw-bold text-danger text-center bg-white" value="0" readonly required>
             </div>
             
             <div class="col-md-4">
                 <label class="form-label fw-bold">المدفوع</label>
-                <div class="input-group">
-                    <input type="number" name="paid_amount" id="paid_amount" class="form-control fs-4 fw-bold text-success text-center" value="0" min="0" step="0.01" required>
-                    <span class="input-group-text">جنيه</span>
-                </div>
+                <input type="number" name="paid_amount" id="paid_amount" class="form-control fs-4 fw-bold text-success text-center" value="0" min="0" step="0.01" required>
             </div>
             
             <div class="col-md-4">
                 <label class="form-label fw-bold">الباقي</label>
-                <div class="input-group">
-                    <input type="number" name="remaining_amount" id="remaining_amount" class="form-control fs-4 fw-bold text-secondary text-center bg-white" value="0" readonly>
-                    <span class="input-group-text">جنيه</span>
-                </div>
+                <input type="number" name="remaining_amount" id="remaining_amount" class="form-control fs-4 fw-bold text-secondary text-center bg-white" value="0" readonly>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+            <div class="col-md-4">
+                <label class="form-label fw-bold"><i class="fa-solid fa-vault text-info"></i> الصندوق / الخزنة</label>
+                <select name="safe_id" class="form-select" required>
+                    <option value="">-- اختر الصندوق --</option>
+                    @foreach($safes as $safe)
+                        <option value="{{ $safe->id }}">{{ $safe->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-12">
+                <label class="form-label fw-bold"><i class="fa-solid fa-sticky-note text-warning"></i> ملاحظات الفاتورة</label>
+                <textarea name="invoice_notes" class="form-control" rows="2" placeholder="أدخل ملاحظات على مستوى الفاتورة هنا..."></textarea>
             </div>
         </div>
     </div>
@@ -132,10 +162,7 @@
             </div>
             <div class="modal-body p-4">
                 <form id="quickAddCustomerForm">
-                    <div class="mb-3">
-                    <label class="form-label">ملاحظات الفاتورة</label>
-                    <textarea name="invoice_notes" class="form-control" rows="2" placeholder="أدخل ملاحظات الفاتورة هنا"></textarea>
-                </div>
+                    <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label">الاسم <span class="text-danger">*</span></label>
                             <input type="text" name="name" id="modal_cust_name" class="form-control frst" required>
@@ -147,6 +174,10 @@
                         <div class="col-md-6">
                             <label class="form-label">رقم الهاتف 2</label>
                             <input type="text" name="phone_2" id="modal_cust_phone2" class="form-control">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">الرقم القومي</label>
+                            <input type="text" name="national_id" id="modal_cust_national_id" class="form-control" placeholder="أدخل الرقم القومي">
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">العنوان</label>
@@ -179,6 +210,7 @@
     $(document).ready(function() {
         // Initialize Select2
         $('.select2').select2({ dir: "rtl" });
+        $('.select2-item').select2({ dir: "rtl", placeholder: '-- ابحث عن الصنف --' });
         $('.select2-modal').select2({ dir: "rtl", dropdownParent: $('#newCustomerModal') });
 
         let rowIdx = 1;
@@ -237,12 +269,13 @@
                     </td>
                     <td><input type="number" name="items[${rowIdx}][qty]" class="form-control text-center input-qty" value="1" min="1" required></td>
                     <td><input type="number" name="items[${rowIdx}][price]" class="form-control text-center input-price" value="0" min="0" step="0.01" required></td>
+                    <td><textarea name="items[${rowIdx}][notes]" class="form-control" rows="1" placeholder="ملاحظات الصنف"></textarea></td>
                     <td><input type="number" name="items[${rowIdx}][total]" class="form-control text-center input-total bg-light fw-bold" value="0" readonly></td>
                     <td><button type="button" class="btn btn-sm btn-danger remove-row"><i class="fa-solid fa-times"></i></button></td>
                 </tr>
             `;
             $('#itemsTable tbody').append(tr);
-            $('#itemsTable tbody tr:last').find('.select2-dyn').select2({ dir: "rtl" });
+            $('#itemsTable tbody tr:last').find('.select2-dyn').select2({ dir: "rtl", placeholder: '-- ابحث عن الصنف --' });
             
             // Enable remove button on first row if > 1
             if($('#itemsTable tbody tr').length > 1) {
@@ -269,6 +302,7 @@
                 name: $('#modal_cust_name').val(),
                 phone: $('#modal_cust_phone').val(),
                 phone_2: $('#modal_cust_phone2').val(),
+                national_id: $('#modal_cust_national_id').val(),
                 address: $('#modal_cust_address').val(),
                 referred_by: $('#modal_cust_ref').val()
             };

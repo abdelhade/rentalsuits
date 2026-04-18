@@ -23,6 +23,29 @@
 
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+    
+    <!-- Theme Engine Settings -->
+    <script>
+        (function() {
+            var currTheme = localStorage.getItem('appTheme') || 'light';
+            var mainColor = localStorage.getItem('appMainColor') || '#e6b325';
+            var fontValue = localStorage.getItem('appFont') || 'Tajawal';
+
+            if (currTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+
+            document.documentElement.style.setProperty('--secondary', mainColor);
+            
+            if (fontValue && fontValue !== 'Tajawal') {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://fonts.googleapis.com/css2?family=' + fontValue.replace(' ', '+') + ':wght@400;500;700;800&display=swap';
+                document.head.appendChild(link);
+            }
+            document.documentElement.style.setProperty('--main-font', "'" + fontValue + "', sans-serif");
+        })();
+    </script>
 
     <style>
         :root {
@@ -31,11 +54,22 @@
             --bg-color: #f4f6f9;
             --glass-bg: rgba(255, 255, 255, 0.85);
             --sidebar-width: 260px;
+            --text-color: #2b3a4a;
+            --card-text: #000;
+        }
+
+        :root.dark-mode {
+            --primary: #121921;
+            --bg-color: #1a222a;
+            --glass-bg: rgba(30, 40, 50, 0.85);
+            --text-color: #e0e0e0;
+            --card-text: #fff;
         }
 
         body {
-            font-family: 'Tajawal', sans-serif;
+            font-family: var(--main-font, 'Tajawal', sans-serif);
             background-color: var(--bg-color);
+            color: var(--text-color);
             overflow-x: hidden;
         }
 
@@ -129,6 +163,7 @@
 
         /* Card Glassmorphism */
         .card-glass {
+            color: var(--text-color);
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.4);
@@ -245,7 +280,7 @@
                         <i class="fa-solid fa-user-circle"></i> المدير
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">الإعدادات</a></li>
+                        <li><a class="dropdown-item" href="{{ route('settings') }}">الإعدادات</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">
@@ -295,11 +330,33 @@
 
         // Global F3 Shortcut for 'Add New'
         $(document).on('keydown', function(e) {
+            // F3: Add New
             if (e.key === 'F3') {
-                e.preventDefault(); // Prevent default browser search behavior
+                e.preventDefault(); 
                 var addNewBtn = $('#add-new-btn');
                 if (addNewBtn.length) {
                     window.location.href = addNewBtn.attr('href');
+                }
+            }
+            
+            // F12: Save / Submit
+            if (e.key === 'F12') {
+                e.preventDefault();
+                // Find a submit button that hasbtn-primary (like Save) or check for word 'حفظ'
+                var saveBtn = $('button[type="submit"].btn-primary').first();
+                if (saveBtn.length) {
+                    saveBtn.click();
+                } else {
+                    // Fallback to finding the first non-delete, non-logout form
+                    var form = $('form').filter(function() {
+                        var isLogout = $(this).attr('action') && $(this).attr('action').includes('logout');
+                        var isDelete = $(this).find('input[name="_method"][value="DELETE"]').length > 0;
+                        return !isLogout && !isDelete;
+                    }).first();
+                    
+                    if (form.length) {
+                        form.submit();
+                    }
                 }
             }
         });
@@ -307,3 +364,4 @@
     @stack('scripts')
 </body>
 </html>
+

@@ -16,8 +16,8 @@
             </div>
 
             <div class="col-md-6 mb-3">
-                <label for="category_id" class="form-label">المجموعة الشجرية <span class="text-danger">*</span></label>
-                <select name="category_id" id="category_id" class="form-select select2" required>
+                <label for="category_id" class="form-label">المجموعة الشجرية (اختياري)</label>
+                <select name="category_id" id="category_id" class="form-select select2">
                     <option value="">اختر المجموعة...</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>

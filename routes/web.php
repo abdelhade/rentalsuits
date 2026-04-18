@@ -26,6 +26,12 @@ Route::middleware('auth')->group(function() {
         return view('dashboard');
     })->name('dashboard');
 
+    Route::get('/rentals/create', [\App\Http\Controllers\RentalController::class, 'create'])->name('rentals.create');
+
+    Route::get('/settings', function () {
+        return view('settings');
+    })->name('settings');
+
     Route::get('/reports/ledger', function () {
         return view('reports.ledger');
     })->name('reports.ledger');

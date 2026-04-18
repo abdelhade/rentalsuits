@@ -35,7 +35,7 @@ class ItemController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $request->validate([
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
             'name' => 'required|string|max:255',
             'barcode' => 'nullable|string|max:50|unique:items,barcode',
             'purchase_price' => 'required|numeric|min:0',
@@ -58,7 +58,7 @@ class ItemController extends Controller implements HasMiddleware
     public function update(Request $request, Item $item)
     {
         $request->validate([
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
             'name' => 'required|string|max:255',
             'barcode' => 'nullable|string|max:50|unique:items,barcode,'.$item->id,
             'purchase_price' => 'required|numeric|min:0',

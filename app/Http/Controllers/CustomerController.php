@@ -37,25 +37,36 @@ class CustomerController extends Controller implements HasMiddleware
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
+            'phone_2' => 'nullable|string|max:20',
             'city' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
+            'referred_by' => 'nullable|exists:customers,id',
         ]);
 
-        DB::transaction(function () use ($request) {
+        $customer = DB::transaction(function () use ($request) {
             $account = Account::create([
                 'name' => $request->name . ' (عميل)',
                 'code' => 'CUST-' . time() . rand(10,99),
                 'type' => 'asset',
             ]);
 
-            Customer::create([
+            return Customer::create([
                 'account_id' => $account->id,
                 'name' => $request->name,
                 'phone' => $request->phone,
+                'phone_2' => $request->phone_2,
                 'city' => $request->city,
                 'address' => $request->address,
+                'referred_by' => $request->referred_by,
             ]);
         });
+
+        if ($request->has('quick_ajax')) {
+            return response()->json([
+                'success' => true,
+                'customer' => $customer
+            ]);
+        }
 
         return redirect()->route('customers.index')->with('success', 'تم إضافة العميل بنجاح');
     }
@@ -70,12 +81,14 @@ class CustomerController extends Controller implements HasMiddleware
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
+            'phone_2' => 'nullable|string|max:20',
             'city' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
+            'referred_by' => 'nullable|exists:customers,id',
         ]);
 
         DB::transaction(function () use ($request, $customer) {
-            $customer->update($request->only('name', 'phone', 'city', 'address'));
+            $customer->update($request->only('name', 'phone', 'phone_2', 'city', 'address', 'referred_by'));
             $customer->account()->update(['name' => $request->name . ' (عميل)']);
         });
 

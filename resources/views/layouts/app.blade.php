@@ -233,7 +233,7 @@
         <div class="sidebar-brand">
             <i class="fa-solid fa-user-tie"></i> رينتالز ERP
         </div>
-        <ul class="sidebar-menu">
+        
             <li class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <a href="/"><i class="fa-solid fa-calendar-days"></i> التقويم والمبيعات</a>
             </li>

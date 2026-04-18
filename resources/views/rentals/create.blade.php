@@ -18,9 +18,13 @@
                     <select name="customer_id" id="customer_id" class="form-select select2" required>
                         <option value="">-- اختر العميل --</option>
                         @foreach($customers as $cust)
-                            <option value="{{ $cust->id }}">{{ $cust->name }} - {{ $cust->phone }}</option>
+                            <option value="{{ $cust->id }}" data-national-id="{{ $cust->national_id }}">{{ $cust->name }} - {{ $cust->phone }}</option>
                         @endforeach
                     </select>
+                    <div class="mt-2">
+                        <label class="form-label">الرقم القومي للعميل</label>
+                        <input type="text" id="customer_national_id" class="form-control" readonly placeholder="سيظهر الرقم القومي عند اختيار العميل">
+                    </div>
                     <button class="btn btn-primary px-3" type="button" data-bs-toggle="modal" data-bs-target="#newCustomerModal">
                         <i class="fa-solid fa-plus"></i> إضافة
                     </button>
@@ -45,6 +49,7 @@
                         <th width="40%">الصنف (البدلة) <span class="text-danger">*</span></th>
                         <th width="15%">الكمية</th>
                         <th width="20%">السعر</th>
+                        <th width="20%">ملاحظات</th>
                         <th width="20%">القيمة (الإجمالي)</th>
                         <th width="5%">إجراء</th>
                     </tr>
@@ -64,6 +69,9 @@
                         </td>
                         <td>
                             <input type="number" name="items[0][price]" class="form-control text-center input-price" value="0" min="0" step="0.01" required>
+                        </td>
+                        <td>
+                            <textarea name="items[0][notes]" class="form-control" rows="1" placeholder="ملاحظات الصنف"></textarea>
                         </td>
                         <td>
                             <input type="number" name="items[0][total]" class="form-control text-center input-total bg-light fw-bold" value="0" readonly>
@@ -124,7 +132,10 @@
             </div>
             <div class="modal-body p-4">
                 <form id="quickAddCustomerForm">
-                    <div class="row g-3">
+                    <div class="mb-3">
+                    <label class="form-label">ملاحظات الفاتورة</label>
+                    <textarea name="invoice_notes" class="form-control" rows="2" placeholder="أدخل ملاحظات الفاتورة هنا"></textarea>
+                </div>
                         <div class="col-md-12">
                             <label class="form-label">الاسم <span class="text-danger">*</span></label>
                             <input type="text" name="name" id="modal_cust_name" class="form-control frst" required>

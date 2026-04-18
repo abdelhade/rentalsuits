@@ -38,6 +38,12 @@
                 <input type="text" name="address" id="address" class="form-control" value="{{ old('address') }}">
                 @error('address')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             </div>
+            <div class="col-md-6 mb-3">
+                <label for="national_id" class="form-label">الرقم القومي <span class="text-danger">*</span></label>
+                <input type="text" name="national_id" id="national_id" class="form-control" value="{{ old('national_id') }}" required>
+                @error('national_id')<div class="text-danger mt-1">{{ $message }}</div>@enderror
+                @error('address')<div class="text-danger mt-1">{{ $message }}</div>@enderror
+            </div>
 
             <div class="col-md-12 mb-3">
                 <label for="referred_by" class="form-label">العميل المرشح</label>

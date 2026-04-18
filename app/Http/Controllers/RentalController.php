@@ -13,7 +13,8 @@ class RentalController extends Controller
         $date = $request->query('date', date('Y-m-d'));
         $customers = Customer::all();
         $items = Item::where('status', 'available')->get();
-        return view('rentals.create', compact('date', 'customers', 'items'));
+        $safes = \App\Models\Safe::all();
+        return view('rentals.create', compact('date', 'customers', 'items', 'safes'));
     }
 
     public function store(Request $request)
@@ -27,15 +28,19 @@ class RentalController extends Controller
             'items.*.price' => 'required|numeric|min:0',
             'total_amount' => 'required|numeric',
             'paid_amount' => 'required|numeric',
+            'safe_id' => 'required|exists:safes,id',
+            'invoice_notes' => 'nullable|string',
+            'items.*.notes' => 'nullable|string',
         ]);
 
         $invoice = new \App\Models\Invoice();
-        $invoice->invoice_number = 'R-' . mt_rand(100000, 999999); // Generate a random invoice number
+        $invoice->invoice_number = 'R-' . mt_rand(100000, 999999);
         $invoice->type = 'rent';
         $invoice->entity_id = $request->customer_id;
         $invoice->date = $request->date;
         $invoice->total_amount = $request->total_amount;
         $invoice->paid_amount = $request->paid_amount;
+        $invoice->notes = $request->invoice_notes ?? null;
         $invoice->save();
 
         foreach ($request->items as $itemData) {
@@ -45,14 +50,21 @@ class RentalController extends Controller
             $item->qty = $itemData['qty'];
             $item->price = $itemData['price'];
             $item->total = $itemData['total'] ?? ($itemData['qty'] * $itemData['price']);
+            $item->notes = $itemData['notes'] ?? null;
             $item->save();
-            
-            // Optionally update item status if needed
-            // $invItem = \App\Models\Item::find($itemData['item_id']);
-            // if ($invItem) {
-            //     $invItem->status = 'rented';
-            //     $invItem->save();
-            // }
+        }
+
+        // If there is a payment, create a receipt voucher linked to the selected safe
+        if (floatval($request->paid_amount) > 0) {
+            $voucher = new \App\Models\Voucher();
+            $voucher->voucher_number = 'V-' . time() . rand(10, 99);
+            $voucher->type = 'receipt';
+            $voucher->safe_id = $request->safe_id;
+            $voucher->account_id = $invoice->entity_id; // assuming the customer account
+            $voucher->amount = $request->paid_amount;
+            $voucher->date = $request->date;
+            $voucher->description = 'سند قبض من الفاتورة ' . $invoice->invoice_number;
+            $voucher->save();
         }
 
         return redirect()->route('rentals.create')->with('success', 'تم حفظ الفاتورة بنجاح');
